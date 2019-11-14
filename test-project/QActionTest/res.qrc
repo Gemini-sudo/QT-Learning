@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/images">
-        <file>res/images/add.png</file>
-        <file>res/images/delete.png</file>
-        <file>res/images/edit.png</file>
-    </qresource>
-    <qresource prefix="/vedios"/>
-    <qresource prefix="/audios"/>
-</RCC>
