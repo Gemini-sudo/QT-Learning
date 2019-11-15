@@ -4,5 +4,7 @@
         <file>res/images/create.png</file>
         <file>res/images/save.png</file>
         <file>res/images/open.png</file>
+        <file>res/images/save_as.png</file>
+        <file>res/images/find.png</file>
     </qresource>
 </RCC>
