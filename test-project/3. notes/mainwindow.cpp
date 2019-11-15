@@ -7,11 +7,13 @@
 #include <QTextDocument>
 #include <QTextBlock>
 #include <QDebug>
+#include <QThread>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     init_ui();
+    init_connection();
 }
 
 MainWindow::~MainWindow()
@@ -30,21 +32,26 @@ void MainWindow::init_ui()
     m_open_action = new QAction();
     m_open_action->setText(tr("打开文档(&N)"));
     m_open_action->setIcon(QIcon(tr(":/res/res/images/open.png")));
+    //m_open_action->setStatusTip(tr("打开文档"));
     m_create_menu->addAction(m_open_action);
+
 
     m_create_action = new QAction();
     m_create_action->setText(tr("新建空文档(&N)"));
     m_create_action->setIcon(QIcon(tr(":/res/res/images/create.png")));
+    //m_create_action->setStatusTip(tr("新建空文档"));
     m_create_menu->addAction(m_create_action);
 
     m_save_action = new QAction();
     m_save_action->setText(tr("保存当前文档(&S)"));
     m_save_action->setIcon(QIcon(tr(":/res/res/images/save.png")));
+    //m_save_action->setStatusTip(tr("保存当前文档"));
     m_create_menu->addAction(m_save_action);
 
     m_save_as_action = new QAction();
     m_save_as_action->setText(tr("另存为(&P)"));
     m_save_as_action->setIcon(QIcon(tr(":/res/res/images/save_as.png")));
+    //m_save_as_action->setStatusTip(tr("另存为"));
     m_create_menu->addAction(m_save_as_action);
     this->menuBar()->addMenu(m_create_menu);
 
@@ -56,6 +63,7 @@ void MainWindow::init_ui()
     m_find_action->setText(tr("查找(&F)"));
     m_find_action->setShortcut(QKeySequence(tr("ctrl+F")));
     m_find_action->setIcon(QIcon(tr(":/res/res/images/find.png")));
+    //m_find_action->setStatusTip(tr("查找"));
     m_find_menu->addAction(m_find_action);
     this->menuBar()->addMenu(m_find_menu);
 
@@ -66,6 +74,7 @@ void MainWindow::init_ui()
     m_about_action = new QAction();
     m_about_action->setText(tr("关于本软件(&I)"));
     m_about_action->setIcon(QIcon(tr(":/res/res/images/about.png")));
+    //m_about_action->setStatusTip(tr("关于本软件"));
     m_about_menu->addAction(m_about_action);
     this->menuBar()->addMenu(m_about_menu);
 
@@ -75,36 +84,42 @@ void MainWindow::init_ui()
     m_open_btn->setText(tr("打开"));
     m_open_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_open_btn->setShortcut(QKeySequence(tr("ctrl+O")));
+    //m_open_btn->setStatusTip(tr("打开"));
 
     m_create_btn = new QToolButton();
     m_create_btn->setIcon(QIcon(tr(":/res/res/images/create.png")));
     m_create_btn->setText(tr("新建"));
     m_create_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_create_btn->setShortcut(QKeySequence(tr("ctrl+N")));
+    //m_create_btn->setStatusTip(tr("新建"));
 
     m_save_btn = new QToolButton();
     m_save_btn->setIcon(QIcon(tr(":/res/res/images/save.png")));
     m_save_btn->setText(tr("保存"));
     m_save_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_save_btn->setShortcut(QKeySequence(tr("ctrl+S")));
+    //m_save_btn->setStatusTip(tr("保存"));
 
     m_save_as_btn = new QToolButton();
     m_save_as_btn->setIcon(QIcon(tr(":/res/res/images/save_as.png")));
     m_save_as_btn->setText(tr("另存为"));
     m_save_as_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_save_as_btn->setShortcut(QKeySequence(tr("ctrl+P")));
+    //m_save_as_btn->setStatusTip(tr("另存为"));
 
     m_find_btn = new QToolButton();
     m_find_btn->setIcon(QIcon(tr(":/res/res/images/find.png")));
     m_find_btn->setText(tr("查找"));
     m_find_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_find_btn->setShortcut(QKeySequence(tr("ctrl+L")));
+    //m_find_btn->setStatusTip(tr("查找"));
 
     m_about_btn = new QToolButton();
     m_about_btn->setIcon(QIcon(tr(":/res/res/images/about.png")));
     m_about_btn->setText(tr("关于"));
     m_about_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_about_btn->setShortcut(QKeySequence(tr("ctrl+I")));
+    //m_about_btn->setStatusTip(tr("关于"));
 
     QToolBar *p_tool_bar = this->addToolBar("toolbar");
     p_tool_bar->addWidget(m_create_btn);
@@ -127,6 +142,20 @@ void MainWindow::init_ui()
     m_main_widget->setLayout(m_main_layout);
     setCentralWidget(m_main_widget);
 
+    m_status_bar = statusBar();
+    m_status_tips = new QLabel(this);
+    m_status_tips->setText(tr("就绪"));
+
+    m_open_progress = new QProgressBar(this);
+    m_open_progress->setRange(0, 100);
+    m_open_progress->setValue(0);
+
+    m_status_bar->addWidget(m_status_tips);
+    m_status_bar->addPermanentWidget(m_open_progress);
+}
+
+void MainWindow::init_connection()
+{
     connect(m_open_action, SIGNAL(triggered()), this, SLOT(open_file()));
     connect(m_create_action, SIGNAL(triggered()), this, SLOT(create_empty_file()));
     connect(m_save_action, SIGNAL(triggered()), this, SLOT(save_file()));
@@ -147,6 +176,12 @@ void MainWindow::open_file()
     m_file_path = QFileDialog::getOpenFileUrl(this, tr("打开文件"), QUrl(QDir::currentPath()), self_filter).toLocalFile();
     if(!m_file_path.isEmpty())
     {
+        m_status_tips->setText(tr("正在打开文件:") + m_file_path);
+        //动态变化进度条
+        int max_size = 1;
+        m_open_progress->setMaximum(max_size);
+        m_open_progress->setValue(max_size - 1);
+
         m_text_edit->clear();
         QFile local_file(m_file_path);
         local_file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -155,13 +190,20 @@ void MainWindow::open_file()
         while (!tmp.empty())
         {
             line_text += QString::fromStdString(tmp);
-            if(tmp.find("\0") != -1)
+            if(tmp.find("\n") != -1)
             {
+                line_text.remove(tr("\n"));
                 m_text_edit->append(line_text);
-                tmp = local_file.readLine(1024).toStdString();
                 line_text.clear();
+
+                max_size += 1;
+                m_open_progress->setMaximum(max_size);
+                m_open_progress->setValue(max_size - 1);
             }
+            tmp = local_file.readLine(1024).toStdString();
         }
+        m_open_progress->setValue(max_size);
+        m_status_tips->setText(tr("文件打开成功"));
         m_text_edit->append(line_text);
         local_file.close();
     }

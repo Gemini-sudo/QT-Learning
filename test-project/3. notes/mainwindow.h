@@ -16,6 +16,10 @@
 
 #include <QInputDialog>
 
+#include <QStatusBar>
+#include <QLabel>
+#include <QProgressBar>
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -26,6 +30,7 @@ public:
 
 private:
     void init_ui();
+    void init_connection();
 
     QMenu *m_create_menu;
     QAction *m_open_action;
@@ -49,6 +54,10 @@ private:
     QTextEdit *m_text_edit;
     QVBoxLayout *m_main_layout;
     QWidget *m_main_widget;
+
+    QStatusBar *m_status_bar;
+    QLabel *m_status_tips;
+    QProgressBar *m_open_progress;
 
     QString m_file_path;
 
