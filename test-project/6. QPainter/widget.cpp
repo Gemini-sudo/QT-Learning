@@ -28,28 +28,29 @@ void Widget::paintEvent(QPaintEvent *event)
 {
     QPen pen;
     pen.setWidth(5);
+    pen.setColor(QColor(0, 191, 255));
 
     if(m_clear_line)  //there are some bugs here.
     {
-        QPainter painter(m_pixmap);
-        pen.setColor(Qt::white);
+        QPixmap pixmap = *m_pixmap;
+        QPainter painter(&pixmap);
+
         painter.setPen(pen);
-        painter.drawLine(m_last_point, m_tmp_point);
+        painter.drawLine(m_last_point, m_current_point);
+
+        QPainter main_painter(this);
+        main_painter.drawPixmap(0, 0, pixmap);
+        m_clear_line = false;
+    }
+    else
+    {
+        QPainter painter(m_pixmap);
+        painter.setPen(pen);
+        painter.drawLine(m_last_point, m_current_point);
 
         QPainter main_painter(this);
         main_painter.drawPixmap(0, 0, *m_pixmap);
-
-        m_clear_line = false;
     }
-
-    pen.setColor(QColor(0, 191, 255));
-
-    QPainter painter(m_pixmap);
-    painter.setPen(pen);
-    painter.drawLine(m_last_point, m_current_point);
-
-    QPainter main_painter(this);
-    main_painter.drawPixmap(0, 0, *m_pixmap);
 }
 
 void Widget::mousePressEvent(QMouseEvent *event)
@@ -78,6 +79,7 @@ void Widget::mousePressEvent(QMouseEvent *event)
         m_current_point.setY(event->y());
     }
 
+    m_clear_line = true;
     this->repaint();
 }
 
