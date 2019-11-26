@@ -18,6 +18,7 @@ Widget::Widget(QWidget *parent)
     QStringList strList;
     strList << "name" << "value";
     m_tree_widget->setHeaderLabels(strList);
+    //m_tree_widget->setHeaderHidden(true);  //隐藏表头
     m_tree_widget->addTopLevelItem(first_item);
     m_tree_widget->addTopLevelItem(second_item);
     m_tree_widget->addTopLevelItem(third_item);
