@@ -24,7 +24,6 @@ public:
 
 private slots:
     void get_exe_file();
-    void get_icon_file();
     void get_result();
 
 signals:
@@ -34,11 +33,6 @@ private:
     QLabel *exe_name_label;
     QLineEdit *exe_name_edit;
     QHBoxLayout *exe_name_layout;
-
-    QLabel *exe_icon_label;
-    QLineEdit *exe_icon_edit;
-    QClickableLabel *exe_icon_choose;
-    QHBoxLayout *exe_icon_layout;
 
     QLabel *exe_label;
     QLineEdit *exe_edit;

@@ -6,8 +6,8 @@ AddItemWidget::AddItemWidget(QWidget *parent)
     setWindowOpacity(0.8);
     setStyleSheet("background-color: #fffdf9;");
 
-    setMaximumSize(QSize(400, 200));
-    setMinimumSize(QSize(400, 200));
+    setMaximumSize(QSize(400, 150));
+    setMinimumSize(QSize(400, 150));
     setWindowTitle("添加应用程序");
 
     exe_name_label = new QLabel(this);
@@ -22,27 +22,6 @@ AddItemWidget::AddItemWidget(QWidget *parent)
     exe_name_layout = new QHBoxLayout();
     exe_name_layout->addWidget(exe_name_label, 4);
     exe_name_layout->addWidget(exe_name_edit, 6);
-
-    exe_icon_label = new QLabel(this);
-    exe_icon_label->setText("应用程序图标：");
-    exe_icon_label->setStyleSheet("padding:0px;margin:0px;width:100px;height:40px;border-radius: 5px;background: #FFDEAD;color: #FFFFFF;");
-    exe_icon_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    exe_icon_edit = new QLineEdit(this);
-    exe_icon_edit->setEnabled(false);
-    exe_icon_edit->setStyleSheet("padding:0px;margin:0px;height:40px;border-radius: 5px;");
-    exe_icon_edit->setPlaceholderText("请选择应用程序的图标文件");
-    exe_icon_edit->setText(":/images/app.ico");
-
-    exe_icon_choose = new QClickableLabel(this);
-    exe_icon_choose->setText("...");
-    exe_icon_choose->setStyleSheet("padding:0px;margin:0px;width:30px;height:40px;border-radius: 5px;background: #00BFFF;color: #FFFFFF;");
-    exe_icon_choose->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-    exe_icon_layout = new QHBoxLayout();
-    exe_icon_layout->addWidget(exe_icon_label, 4);
-    exe_icon_layout->addWidget(exe_icon_edit, 5);
-    exe_icon_layout->addWidget(exe_icon_choose, 1);
 
     exe_label = new QLabel(this);
     exe_label->setText("应用程序文件：");
@@ -71,13 +50,11 @@ AddItemWidget::AddItemWidget(QWidget *parent)
 
     main_layout = new QVBoxLayout();
     main_layout->addLayout(exe_name_layout, 1);
-    main_layout->addLayout(exe_icon_layout, 1);
     main_layout->addLayout(exe_layout, 1);
     main_layout->addWidget(comfirm_label, 1);
 
     setLayout(main_layout);
 
-    connect(exe_icon_choose, SIGNAL(clicked()), this, SLOT(get_icon_file()));
     connect(exe_choose, SIGNAL(clicked()), this, SLOT(get_exe_file()));
     connect(comfirm_label, SIGNAL(clicked()), this, SLOT(get_result()));
 }
@@ -96,26 +73,15 @@ void AddItemWidget::get_exe_file()
     }
 }
 
-void AddItemWidget::get_icon_file()
-{
-    QString exe_file_path = QFileDialog::getOpenFileUrl(this, tr("请选择一个文件"), QDir::currentPath().append("\\"), tr("图标文件(*.png *.jpg *.ico);;所有文件(*.*);;")).toLocalFile();
-    if(!exe_file_path.isEmpty())
-    {
-        exe_icon_edit->setText(exe_file_path);
-    }
-}
-
 void AddItemWidget::get_result()
 {
     QString exe_name = exe_name_edit->text();
     QString exe_path = exe_edit->text();
-    QString icon_path = exe_icon_edit->text();
-    if(!exe_path.isEmpty() && !exe_name.isEmpty() && !icon_path.isEmpty())
+    if(!exe_path.isEmpty() && !exe_name.isEmpty())
     {
         ExecutorInfo executor_info;
         executor_info.executorName = exe_name;
         executor_info.executorPath = exe_path;
-        executor_info.iconPath = icon_path;
 
         emit add_new_info(executor_info);
         this->close();

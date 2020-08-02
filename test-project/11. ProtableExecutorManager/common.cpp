@@ -29,10 +29,6 @@ bool read_xml_file(const QString file_path, QList<ExecutorInfo>& executor_info_l
             {
                 exe_info.executorName = third_node.toElement().text();
             }
-            else if(third_node.toElement().tagName() == "icon")
-            {
-                exe_info.iconPath = third_node.toElement().text();
-            }
             else if(third_node.toElement().tagName() == "exepath" && QFile::exists(third_node.toElement().text()))
             {
                 exe_info.executorPath = third_node.toElement().text();
@@ -41,7 +37,7 @@ bool read_xml_file(const QString file_path, QList<ExecutorInfo>& executor_info_l
             third_node = third_node.nextSibling();
         }
 
-        if(!exe_info.executorName.isEmpty() && !exe_info.iconPath.isEmpty() && !exe_info.executorPath.isEmpty())
+        if(!exe_info.executorName.isEmpty() && !exe_info.executorPath.isEmpty())
         {
             executor_info_list.push_back(exe_info);
         }
@@ -60,7 +56,6 @@ bool write_xml_file(const QString file_path, const QList<ExecutorInfo>& executor
     {
         xml_content.append("<info>");
         xml_content.append("<name>").append(exe_info.executorName).append("</name>");
-        xml_content.append("<icon>").append(exe_info.iconPath).append("</icon>");
         xml_content.append("<exepath>").append(exe_info.executorPath).append("</exepath>");
         xml_content.append("</info>");
     }

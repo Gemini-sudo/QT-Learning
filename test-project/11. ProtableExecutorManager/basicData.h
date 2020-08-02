@@ -5,7 +5,6 @@
 
 struct ExecutorInfo
 {
-    QString iconPath;
     QString executorPath;
     QString executorName;
 };

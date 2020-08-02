@@ -8,6 +8,7 @@
 #include <QBitmap>
 #include <QPixmap>
 #include <QIcon>
+#include <QFileIconProvider>
 
 #include <QDebug>
 #include "addItemWidget.h"
@@ -112,9 +113,10 @@ void Widget::show_executor_info()
         QListWidgetItem* list_item = new QListWidgetItem();
         list_item->setText(exe_info.executorName);
 
-        QPixmap pixmap(exe_info.iconPath);
-        pixmap = pixmap.scaled(80, 65);
-        list_item->setIcon(QIcon(pixmap));
+        QFileInfo file_info(exe_info.executorPath);
+        QFileIconProvider icon_provider;
+        QIcon icon = icon_provider.icon(file_info);
+        list_item->setIcon(icon);
 
         list_item->setData(Qt::UserRole, exe_info.executorPath);
         m_executor_infos->addItem(list_item);
@@ -122,7 +124,7 @@ void Widget::show_executor_info()
 
     QListWidgetItem* list_item = new QListWidgetItem();
     QPixmap pixmap(":/images/add.ico");
-    pixmap = pixmap.scaled(80, 80);
+    pixmap = pixmap.scaled(50, 50);
     list_item->setIcon(QIcon(pixmap));
     list_item->setData(Qt::UserRole, "add");
     m_executor_infos->addItem(list_item);
